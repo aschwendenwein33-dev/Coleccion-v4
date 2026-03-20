@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ColecciónCAP</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #F5C400;
+  --gold-glow: rgba(245,196,0,0.15);
+  --black: #0e0e0e;
+  --surface: #161616;
+  --card: #1e1e1e;
+  --border: #2e2e2e;
+  --text: #f0f0f0;
+  --muted: #777;
+  --danger: #e05252;
+  --success: #4ec994;
+  --radius: 14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(-55deg,transparent,transparent 38px,rgba(245,196,0,0.022) 38px,rgba(245,196,0,0.022) 40px);pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 16px 80px}
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;padding:24px 0 28px;border-bottom:1px solid var(--border);margin-bottom:28px;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-badge{width:52px;height:52px;background:var(--gold);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 24px rgba(245,196,0,0.35);flex-shrink:0}
+.brand-name{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;line-height:1;color:var(--gold);text-shadow:0 0 30px rgba(245,196,0,0.3)}
+.brand-sub{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
+.header-actions{display:flex;gap:10px;flex-wrap:wrap}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.18s;white-space:nowrap}
+.btn-gold{background:var(--gold);color:#0e0e0e}
+.btn-gold:hover{background:#ffd320;box-shadow:0 4px 18px rgba(245,196,0,0.3);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-ghost{background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:#444}
+.btn-danger{background:rgba(224,82,82,0.12);color:var(--danger);border:1px solid rgba(224,82,82,0.2)}
+.btn-danger:hover{background:rgba(224,82,82,0.2)}
+.btn-sm{padding:7px 13px;font-size:12px;border-radius:7px}
+/* STATS */
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform 0.4s}
+.stat:hover::after{transform:scaleX(1)}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:var(--gold)}
+.stat-lbl{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--surface);border-radius:11px;padding:4px;margin-bottom:24px;border:1px solid var(--border)}
+.tab{flex:1;padding:9px 6px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.tab.active{background:var(--card);color:var(--gold);box-shadow:0 1px 6px rgba(0,0,0,0.4)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+/* FILTERS */
+.filter-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.filter-bar input,.filter-bar select{flex:1;min-width:140px}
+input,select,textarea{width:100%;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+select option{background:var(--surface)}
+textarea{resize:vertical;min-height:80px}
+/* GRID */
+.jerseys-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.jersey-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all 0.22s;position:relative}
+.jersey-card:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:0 8px 32px rgba(245,196,0,0.12)}
+.jersey-photo{width:100%;height:220px;background:var(--surface);overflow:hidden;}
+.jersey-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
+.jersey-photo-placeholder{width:100%;height:220px;background:linear-gradient(135deg,var(--surface),#252525);display:flex;align-items:center;justify-content:center;font-size:52px}
+.jersey-body{padding:14px 16px}
+.jersey-id{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:6px}
+.jersey-name{font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1.1;color:var(--text);margin-bottom:8px}
+.jersey-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tag{padding:3px 8px;border-radius:5px;font-size:11px;font-family:'DM Mono',monospace;font-weight:500}
+.tag-gold{background:rgba(245,196,0,0.12);color:var(--gold);border:1px solid rgba(245,196,0,0.2)}
+.tag-gray{background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid var(--border)}
+.tag-green{background:rgba(78,201,148,0.12);color:var(--success);border:1px solid rgba(78,201,148,0.2)}
+.tag-red{background:rgba(224,82,82,0.12);color:var(--danger);border:1px solid rgba(224,82,82,0.2)}
+.jersey-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)}
+.jersey-value{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold)}
+.nfc-badge{position:absolute;top:10px;right:10px;background:rgba(14,14,14,0.85);border:1px solid var(--gold);border-radius:6px;padding:4px 8px;font-size:10px;font-family:'DM Mono',monospace;color:var(--gold);backdrop-filter:blur(4px)}
+/* OVERLAY / MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:20px 16px;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 0.25s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:18px;width:100%;max-width:680px;padding:28px;transform:translateY(20px);transition:transform 0.25s;margin:auto}
+.overlay.open .modal{transform:translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold);letter-spacing:1px}
+.modal-close{width:32px;height:32px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.modal-close:hover{color:var(--text);border-color:#555}
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid .full{grid-column:1/-1}
+@media(max-width:520px){.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:1}}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+/* PHOTO UPLOAD */
+.photo-drop{border:2px dashed var(--border);border-radius:12px;padding:20px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.2s;background:var(--surface);margin-bottom:12px}
+.photo-drop:hover{border-color:var(--gold);background:var(--gold-glow)}
+.photo-drop-icon{font-size:32px;flex-shrink:0}
+.photo-drop-text{flex:1}
+.photo-drop-title{font-size:14px;font-weight:700;color:var(--text)}
+.photo-drop-hint{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:3px}
+.photos-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.photo-slot{aspect-ratio:1;border:2px dashed var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;overflow:hidden;position:relative;background:var(--surface)}
+.photo-slot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.photo-slot .ph-lbl{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;z-index:1}
+.photo-slot .ph-icon{font-size:20px;z-index:1;opacity:0.4}
+.photo-del{position:absolute;top:5px;right:5px;z-index:2;width:24px;height:24px;border-radius:6px;background:rgba(0,0,0,0.75);border:none;color:#fff;font-size:13px;cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:700}
+.photo-slot:hover .photo-del{display:flex}
+/* DETAIL */
+.detail-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.detail-photo{aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--border)}
+.detail-photo img{width:100%;height:100%;object-fit:cover}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:520px){.detail-grid{grid-template-columns:1fr 1fr}}
+.detail-field{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 14px}
+.detail-field .lbl{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.detail-field .val{font-size:15px;font-weight:700;color:var(--text)}
+.detail-field.gold-val .val{color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:22px}
+/* URL COPY BOX */
+.url-box{background:var(--surface);border:1px solid rgba(245,196,0,0.3);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.url-box-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.url-box-row{display:flex;align-items:center;gap:10px}
+.url-box-text{flex:1;font-size:12px;font-family:'DM Mono',monospace;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:8px 12px}
+.url-copy-btn{flex-shrink:0;padding:9px 16px;background:var(--gold);color:#0e0e0e;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.2s}
+.url-copy-btn:hover{background:#ffd320}
+.url-copy-btn.copied{background:var(--success);color:#fff}
+/* COMMENT */
+.detail-comment{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px;font-size:13px;line-height:1.6;color:var(--muted);margin-bottom:16px}
+/* NFC */
+.nfc-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.nfc-panel-title{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);letter-spacing:1px;margin-bottom:16px}
+.nfc-zone{border:2px dashed var(--border);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.25s;margin-bottom:16px}
+.nfc-zone:hover,.nfc-zone.scanning{border-color:var(--gold);background:var(--gold-glow)}
+.nfc-zone.scanning{animation:nfc-pulse 1.5s ease-in-out infinite}
+@keyframes nfc-pulse{0%,100%{box-shadow:0 0 0 rgba(245,196,0,0)}50%{box-shadow:0 0 20px rgba(245,196,0,0.2)}}
+.nfc-icon{font-size:40px;margin-bottom:10px}
+.nfc-lbl{font-size:14px;font-weight:600;color:var(--text)}
+.nfc-hint{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:4px}
+.ios-guide{background:rgba(245,196,0,0.06);border:1px solid rgba(245,196,0,0.15);border-radius:10px;padding:16px}
+.ios-guide-title{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:12px}
+.ios-steps{display:flex;flex-direction:column;gap:8px}
+.ios-step{display:flex;gap:10px;align-items:flex-start}
+.ios-step-num{width:22px;height:22px;border-radius:50%;background:var(--gold);color:#0e0e0e;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ios-step-text{font-size:12px;line-height:1.5;color:var(--muted)}
+.ios-step-text code{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text)}
+/* STATS */
+.stats-detail{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.stats-detail{grid-template-columns:1fr}}
+.stats-block{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.stats-block-title{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;margin-bottom:14px}
+.stats-row-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.stats-row-item:last-child{border-bottom:none}
+.stats-row-lbl{color:var(--muted)}
+.stats-row-val{font-weight:700;color:var(--text);font-family:'DM Mono',monospace}
+.stats-row-val.gld{color:var(--gold)}
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;color:var(--muted);font-family:'DM Mono',monospace;font-size:13px}
+.empty-icon{font-size:52px;display:block;margin-bottom:12px;opacity:0.3}
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:20px;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;transform:translateY(70px);opacity:0;transition:all 0.28s;z-index:9999;min-width:220px;max-width:320px;box-shadow:0 6px 28px rgba(0,0,0,0.5)}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.success{background:#0d2820;border:1px solid var(--success);color:var(--success)}
+#toast.error{background:#2a0e0e;border:1px solid var(--danger);color:var(--danger)}
+#toast.info{background:#221e0a;border:1px solid var(--gold);color:var(--gold)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-badge">🏆</div>
+      <div>
+        <div class="brand-name">ColecciónCAP</div>
+        <div class="brand-sub">Colección de Camisetas Peñarol</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" onclick="openNFCScan()">📡 Escanear NFC</button>
+      <button class="btn btn-gold" onclick="openForm(null)">＋ Nueva Camiseta</button>
+    </div>
+  </header>
+
+  <div class="stats-bar" id="statsBar"></div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('coleccion')">👕 Colección</button>
+    <button class="tab" onclick="switchTab('estadisticas')">📊 Estadísticas</button>
+    <button class="tab" onclick="switchTab('nfc')">📡 NFC / iOS</button>
+  </div>
+
+  <!-- COLECCIÓN -->
+  <div class="tab-panel active" id="tab-coleccion">
+    <div class="filter-bar">
+      <input type="text" id="searchQ" placeholder="Buscar por jugador, año, torneo..." oninput="renderGrid()">
+      <select id="filterVersion" onchange="renderGrid()">
+        <option value="">Todas las versiones</option>
+        <option>Titular</option><option>Alternativa</option><option>Tercera</option><option>Aniversario</option>
+      </select>
+      <select id="filterEstado" onchange="renderGrid()">
+        <option value="">Todos los estados</option>
+        <option>Excelente</option><option>Muy bueno</option><option>Bueno</option><option>Regular</option>
+      </select>
+    </div>
+    <div class="jerseys-grid" id="jerseyGrid"></div>
+  </div>
+
+  <!-- ESTADÍSTICAS -->
+  <div class="tab-panel" id="tab-estadisticas">
+    <div id="statsDetail"></div>
+  </div>
+
+  <!-- NFC -->
+  <div class="tab-panel" id="tab-nfc">
+    <div class="nfc-panel">
+      <div class="nfc-panel-title">📡 Lector NFC</div>
+      <div class="nfc-zone" id="nfcZone" onclick="toggleNFC()">
+        <div class="nfc-icon">🔖</div>
+        <div class="nfc-lbl" id="nfcLbl">Toca para activar escáner</div>
+        <div class="nfc-hint" id="nfcHint">Funciona con Web NFC en Chrome Android</div>
+      </div>
+      <div style="margin-bottom:20px">
+        <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Simular escaneo</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="simScan('found')">✅ Tag registrado</button>
+          <button class="btn btn-ghost btn-sm" onclick="simScan('unknown')">❓ Tag desconocido</button>
+        </div>
+      </div>
+      <div class="ios-guide">
+        <div class="ios-guide-title">🍎 Configurar en iPhone con Atajos de Siri</div>
+        <div class="ios-steps">
+          <div class="ios-step"><div class="ios-step-num">1</div><div class="ios-step-text">Abrí la app <strong style="color:var(--text)">Atajos</strong> y tocá <strong style="color:var(--text)">＋</strong> para crear un nuevo atajo.</div></div>
+          <div class="ios-step"><div class="ios-step-num">2</div><div class="ios-step-text">Agregá <strong style="color:var(--text)">"Interactuar con tag NFC"</strong> → escaneá el tag de la camiseta y ponele nombre (ej: <code>CAM-001</code>).</div></div>
+          <div class="ios-step"><div class="ios-step-num">3</div><div class="ios-step-text">Agregá <strong style="color:var(--text)">"Abrir URL"</strong>. La URL la copiás desde la ficha de cada camiseta con el botón <strong style="color:var(--gold)">📋 Copiar URL</strong>.</div></div>
+          <div class="ios-step"><div class="ios-step-num">4</div><div class="ios-step-text">Activá <strong style="color:var(--text)">"Ejecutar al escanear"</strong> para que abra automáticamente.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORMULARIO -->
+<div class="overlay" id="formOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="formTitle">Nueva Camiseta</div>
+      <button class="modal-close" onclick="closeForm()">✕</button>
+    </div>
+
+    <!-- FOTOS -->
+    <div style="margin-bottom:20px">
+      <label style="font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:10px">Fotos (hasta 3 — podés seleccionar todas juntas)</label>
+      <div class="photo-drop" id="photoDropZone" onclick="document.getElementById('fileInputAll').click()">
+        <span class="photo-drop-icon">📷</span>
+        <div class="photo-drop-text">
+          <div class="photo-drop-title">Seleccionar fotos</div>
+          <div class="photo-drop-hint">Tocá para elegir hasta 3 fotos a la vez</div>
+        </div>
+        <input type="file" id="fileInputAll" accept="image/*" multiple style="display:none" onchange="loadPhotosAll(this)">
+      </div>
+      <div class="photos-row" id="photosPreview">
+        <div class="photo-slot" id="slot0"><span class="ph-icon">🖼️</span><span class="ph-lbl">Foto 1</span><button class="photo-del" onclick="delPhoto(event,0)">✕</button></div>
+        <div class="photo-slot" id="slot1"><span class="ph-icon">🖼️</span><span class="ph-lbl">Foto 2</span><button class="photo-del" onclick="delPhoto(event,1)">✕</button></div>
+        <div class="photo-slot" id="slot2"><span class="ph-icon">🖼️</span><span class="ph-lbl">Foto 3</span><button class="photo-del" onclick="delPhoto(event,2)">✕</button></div>
+      </div>
+    </div>
+
+    <!-- CAMPOS -->
+    <div class="form-grid">
+      <div class="field"><label>ID / UID NFC</label><input type="text" id="fId" placeholder="Ej. CAP-1964-1" oninput="autoURL()"></div>
+      <div class="field"><label>Año / Temporada</label><input type="text" id="fAnio" placeholder="Ej. 2023-24"></div>
+      <div class="field"><label>Modelo</label><input type="text" id="fModelo" placeholder="Ej. Topper · Auténtica"></div>
+      <div class="field"><label>Versión</label>
+        <select id="fVersion"><option>Titular</option><option>Alternativa</option><option>Tercera</option><option>Aniversario</option></select>
+      </div>
+      <div class="field">
+        <label>Edición especial</label>
+        <select id="fEdicionEspecial" onchange="toggleEdicionEspecial()">
+          <option value="no">No</option>
+          <option value="si">Sí</option>
+        </select>
+      </div>
+      <div class="field full" id="campoEdicionEspecial" style="display:none">
+        <label>Descripción de la edición especial</label>
+        <input type="text" id="fEdicionDesc" placeholder="Ej. Centenario del club, Homenaje a Morales...">
+      </div>
+      <div class="field"><label>Talle</label>
+        <select id="fTalle"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>Infantil</option></select>
+      </div>
+      <div class="field"><label>Mangas</label>
+        <select id="fMangas"><option>Corta</option><option>Larga</option></select>
+      </div>
+      <div class="field"><label>Torneo</label><input type="text" id="fTorneo" placeholder="Ej. Apertura · Libertadores"></div>
+      <div class="field"><label>Estado</label>
+        <select id="fEstado"><option>Excelente</option><option>Muy bueno</option><option>Bueno</option><option>Regular</option></select>
+      </div>
+      <div class="field"><label>Jugador (espalda)</label><input type="text" id="fJugador" placeholder="Ej. Suárez"></div>
+      <div class="field"><label>Número de dorsal</label><input type="text" id="fNumero" placeholder="Ej. 9"></div>
+      <div class="field"><label>Valor estimado (USD)</label><input type="number" id="fValor" placeholder="0" min="0"></div>
+      <div class="field full">
+        <label>URL del Atajo NFC</label>
+        <input type="text" id="fUrl" placeholder="Se genera automáticamente al ingresar el ID">
+        <span style="font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:4px">Se genera al escribir el ID · Podés editarla manualmente</span>
+      </div>
+      <div class="field full"><label>Comentarios</label><textarea id="fComentarios" placeholder="Notas, historia, procedencia..."></textarea></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveJersey()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="overlay" id="detailOverlay">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-header">
+      <div class="modal-title" id="detailTitle">—</div>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div id="detailBody"></div>
+    <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" onclick="editCurrent()">✏️ Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteCurrent()">🗑️ Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────
+var db = [];
+var editingId = null;
+var currentDetailId = null;
+var formPhotos = [null, null, null];
+
+function loadDB() {
+  try { var raw = localStorage.getItem('penarol_db3'); db = raw ? JSON.parse(raw) : []; } catch(e) { db = []; }
+}
+function saveDB() { try { localStorage.setItem('penarol_db3', JSON.stringify(db)); } catch(e) {} }
+
+// ── FORM ──────────────────────────────────────────────────
+function openForm(id) {
+  editingId = id || null;
+  formPhotos = [null, null, null];
+  var j = id ? db.find(x => x.id === id) : null;
+  document.getElementById('formTitle').textContent = j ? 'Editar Camiseta' : 'Nueva Camiseta';
+  var fieldMap = { Id:'id', Anio:'anio', Modelo:'modelo', Version:'version', EdicionEspecial:'edicionEspecial', EdicionDesc:'edicionDesc', Talle:'talle', Mangas:'mangas', Torneo:'torneo', Estado:'estado', Jugador:'jugador', Numero:'numero', Valor:'valor', Url:'url', Comentarios:'comentarios' };
+  Object.entries(fieldMap).forEach(([fId, key]) => {
+    var el = document.getElementById('f' + fId);
+    if (!el) return;
+    el.value = j ? (j[key] ?? '') : '';
+  });
+  if (j && j.photos) formPhotos = [...j.photos, null, null, null].slice(0, 3);
+  renderPhotoSlots();
+  // reset edicion especial toggle
+  setTimeout(function() { toggleEdicionEspecial(); }, 10);
+  document.getElementById('formOverlay').classList.add('open');
+}
+
+function closeForm() {
+  document.getElementById('formOverlay').classList.remove('open');
+  editingId = null;
+}
+function toggleEdicionEspecial() {
+  var val = document.getElementById('fEdicionEspecial').value;
+  document.getElementById('campoEdicionEspecial').style.display = val === 'si' ? 'flex' : 'none';
+}
+function autoURL() {
+  if (editingId) return;
+  var idVal = (document.getElementById('fId').value || '').trim();
+  var urlField = document.getElementById('fUrl');
+  var base = 'https://claude.ai/public/artifacts/b3bea0b6-6e5e-4eda-a537-96d070c1b20b';
+  if (idVal) {
+    urlField.value = base + '?uid=' + idVal;
+  } else {
+    urlField.value = '';
+  }
+}
+
+// ── PHOTOS ────────────────────────────────────────────────
+function loadPhotosAll(input) {
+  var files = Array.from(input.files).slice(0, 3);
+  // Find empty slots first; if not enough, overwrite from 0
+  var emptySlots = formPhotos.map((p, i) => p === null ? i : -1).filter(i => i >= 0);
+  var targets = emptySlots.length >= files.length ? emptySlots : [0, 1, 2];
+  
+  files.forEach((file, fi) => {
+    var slot = targets[fi];
+    if (slot === undefined) return;
+    var reader = new FileReader();
+    reader.onload = e => { formPhotos[slot] = e.target.result; renderPhotoSlots(); };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function delPhoto(e, i) {
+  e.stopPropagation();
+  formPhotos[i] = null;
+  renderPhotoSlots();
+}
+
+function renderPhotoSlots() {
+  for (var i = 0; i < 3; i++) {
+    var slot = document.getElementById('slot' + i);
+    var existingImg = slot.querySelector('img');
+    if (existingImg) existingImg.remove();
+    if (formPhotos[i]) {
+      var img = document.createElement('img');
+      img.src = formPhotos[i];
+      slot.insertBefore(img, slot.firstChild);
+    }
+  }
+}
+
+// ── SAVE ──────────────────────────────────────────────────
+function gv(id) { return (( function(){ var e=document.getElementById(id); return e ? e.value : ''; })() || '').trim(); }
+
+function saveJersey() {
+  var id = gv('fId') || ('CAM-' + String(Date.now()).slice(-5));
+  if (!editingId && db.find(j => j.id === id)) {
+    showToast('error', '⚠️ Ese ID ya existe'); return;
+  }
+  var jersey = {
+    id,
+    anio: gv('fAnio'),
+    modelo: gv('fModelo'),
+    version: gv('fVersion'),
+    talle: gv('fTalle'),
+    mangas: gv('fMangas'),
+    torneo: gv('fTorneo'),
+    estado: gv('fEstado'),
+    jugador: gv('fJugador'),
+    numero: gv('fNumero'),
+    valor: parseFloat(gv('fValor')) || 0,
+    edicionEspecial: gv('fEdicionEspecial') || 'no',
+    edicionDesc: gv('fEdicionDesc'),
+    url: gv('fUrl'),
+    comentarios: gv('fComentarios'),
+    photos: formPhotos.filter(Boolean),
+    created: editingId
+      ? (function(){ var found=db.find(function(j){return j.id===editingId;}); return found && found.created ? found.created : new Date().toISOString(); })()
+      : new Date().toISOString()
+  };
+  if (editingId) {
+    var idx = db.findIndex(j => j.id === editingId);
+    if (idx >= 0) db[idx] = jersey;
+  } else {
+    db.unshift(jersey);
+  }
+  saveDB(); renderGrid(); renderStats(); renderStatsDetail(); closeForm();
+  showToast('success', '✅ Camiseta "' + id + '" guardada');
+}
+
+// ── GRID ──────────────────────────────────────────────────
+function vTag(v) { return v==='Titular'?'tag-gold':v==='Alternativa'?'tag-green':'tag-gray'; }
+function eTag(e) { return e==='Excelente'?'tag-green':e==='Regular'?'tag-red':'tag-gray'; }
+
+function renderGrid() {
+  var q = (function(){ var el=document.getElementById('searchQ'); return el ? el.value.toLowerCase() : ''; })();
+  var fv = ( function(){ var el=document.getElementById('filterVersion'); return el ? el.value : ''; })();
+  var fe = ( function(){ var el=document.getElementById('filterEstado'); return el ? el.value : ''; })();
+  var filtered = db.filter(j => {
+    var txt = [j.id,j.anio,j.modelo,j.jugador,j.torneo,j.numero].join(' ').toLowerCase();
+    return (!q || txt.includes(q)) && (!fv || j.version===fv) && (!fe || j.estado===fe);
+  });
+  var grid = document.getElementById('jerseyGrid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><span class="empty-icon">👕</span>Sin camisetas. ¡Agregá la primera!</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(j => {
+    var thumb = j.photos && j.photos[0]
+      ? '<div class="jersey-photo"><img src="' + j.photos[0] + '" alt=""></div>'
+      : '<div class="jersey-photo-placeholder">👕</div>';
+    var jugStr = [j.numero, j.jugador].filter(Boolean).join(' · ');
+    var valStr = j.valor ? 'USD ' + j.valor.toLocaleString() : '—';
+    return '<div class="jersey-card" onclick="openDetail(\'' + j.id + '\')">'
+      + (j.id ? '<div class="nfc-badge">📡 ' + j.id + '</div>' : '')
+      + thumb
+      + '<div class="jersey-body">'
+      + '<div class="jersey-id">' + (j.anio||'—') + ' · ' + (j.modelo||'—') + '</div>'
+      + '<div class="jersey-name">' + (j.torneo||j.version||'Peñarol') + '</div>'
+      + '<div class="jersey-meta">'
+      + '<span class="tag ' + vTag(j.version) + '">' + j.version + '</span>'
+      + '<span class="tag tag-gray">' + j.talle + ' · ' + j.mangas + '</span>'
+      + (j.edicionEspecial === 'si' ? '<span class="tag tag-green">Ed. Especial</span>' : '')
+      + (j.jugador ? '<span class="tag tag-gray">' + jugStr + '</span>' : '')
+      + '</div>'
+      + '<div class="jersey-footer"><span class="jersey-value">' + valStr + '</span><span class="jersey-estado tag ' + eTag(j.estado) + '">' + j.estado + '</span></div>'
+      + '</div></div>';
+  }).join('');
+}
+
+// ── DETAIL ────────────────────────────────────────────────
+function openDetail(id) {
+  var j = db.find(x => x.id === id);
+  if (!j) return;
+  currentDetailId = id;
+  document.getElementById('detailTitle').textContent = j.id + (j.anio ? ' · ' + j.anio : '');
+
+  // Photos
+  var photos = (j.photos || []).concat([null,null,null]).slice(0,3);
+  var photosHtml = photos.map(p =>
+    p ? '<div class="detail-photo"><img src="' + p + '" alt=""></div>'
+      : '<div class="detail-photo">📷</div>'
+  ).join('');
+
+  // Fields
+  var edEsp = j.edicionEspecial === 'si' ? ('Sí' + (j.edicionDesc ? ' · ' + j.edicionDesc : '')) : 'No';
+  var flds = [
+    ['Año', j.anio||'—'], ['Modelo', j.modelo||'—'], ['Versión', j.version||'—'],
+    ['Ed. Especial', edEsp],
+    ['Talle', j.talle||'—'], ['Mangas', j.mangas||'—'], ['Torneo', j.torneo||'—'],
+    ['Estado', j.estado||'—'], ['Jugador', j.jugador||'—'], ['Número', j.numero||'—']
+  ];
+  var fldsHtml = flds.map(([l,v]) =>
+    '<div class="detail-field"><div class="lbl">' + l + '</div><div class="val">' + v + '</div></div>'
+  ).join('');
+  var valHtml = '<div class="detail-field gold-val"><div class="lbl">Valor estimado</div><div class="val">USD ' + (j.valor ? j.valor.toLocaleString() : '—') + '</div></div>';
+
+  // URL box — rendered as static HTML, copy handled by data attribute + event
+  var urlHtml = j.url
+    ? '<div class="url-box"><div class="url-box-label">🔗 URL del Atajo NFC — copiá y pegá en el Atajo de Siri</div><div class="url-box-row"><div class="url-box-text" id="urlText">' + escHtml(j.url) + '</div><button class="url-copy-btn" id="urlCopyBtn" onclick="copyDetailURL()">📋 Copiar URL</button></div></div>'
+    : '';
+
+  var commentHtml = j.comentarios
+    ? '<div class="detail-comment"><strong style="color:var(--muted);font-size:10px;font-family:\'DM Mono\',monospace;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Comentarios</strong>' + escHtml(j.comentarios) + '</div>'
+    : '';
+
+  document.getElementById('detailBody').innerHTML =
+    '<div class="detail-photos">' + photosHtml + '</div>'
+    + '<div class="detail-grid">' + fldsHtml + valHtml + '</div>'
+    + urlHtml
+    + commentHtml;
+
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function copyDetailURL() {
+  var j = db.find(x => x.id === currentDetailId);
+  if (!j || !j.url) return;
+  var btn = document.getElementById('urlCopyBtn');
+
+  // Try clipboard API first
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(j.url).then(() => {
+      if (btn) { btn.textContent = '✅ Copiada!'; btn.classList.add('copied'); }
+      showToast('success', '✅ URL copiada al portapapeles');
+      setTimeout(() => { if (btn) { btn.textContent = '📋 Copiar URL'; btn.classList.remove('copied'); } }, 2500);
+    }).catch(() => fallbackCopy(j.url, btn));
+  } else {
+    fallbackCopy(j.url, btn);
+  }
+}
+
+function fallbackCopy(text, btn) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try {
+    document.execCommand('copy');
+    if (btn) { btn.textContent = '✅ Copiada!'; btn.classList.add('copied'); }
+    showToast('success', '✅ URL copiada');
+    setTimeout(() => { if (btn) { btn.textContent = '📋 Copiar URL'; btn.classList.remove('copied'); } }, 2500);
+  } catch(e) {
+    showToast('error', '❌ No se pudo copiar. Copiala manualmente.');
+  }
+  document.body.removeChild(ta);
+}
+
+function closeDetail() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  currentDetailId = null;
+}
+function editCurrent() { var id = currentDetailId; closeDetail(); setTimeout(() => openForm(id), 80); }
+function deleteCurrent() {
+  if (!currentDetailId) return;
+  if (!confirm('¿Eliminar "' + currentDetailId + '"?')) return;
+  db = db.filter(x => x.id !== currentDetailId);
+  saveDB(); renderGrid(); renderStats(); renderStatsDetail(); closeDetail();
+  showToast('info', '🗑️ Camiseta eliminada');
+}
+
+// ── STATS ─────────────────────────────────────────────────
+function renderStats() {
+  var total = db.length;
+  var valorTotal = db.reduce((s,j) => s + (j.valor||0), 0);
+  var titular = db.filter(j => j.version==='Titular').length;
+  var alt = db.filter(j => j.version==='Alternativa').length;
+  document.getElementById('statsBar').innerHTML =
+    '<div class="stat"><div class="stat-val">' + total + '</div><div class="stat-lbl">Total Camisetas</div></div>'
+    + '<div class="stat"><div class="stat-val">' + titular + '</div><div class="stat-lbl">Titular</div></div>'
+    + '<div class="stat"><div class="stat-val">' + alt + '</div><div class="stat-lbl">Alternativa</div></div>'
+    + '<div class="stat"><div class="stat-val">USD ' + valorTotal.toLocaleString() + '</div><div class="stat-lbl">Valor Colección</div></div>';
+}
+
+function renderStatsDetail() {
+  var total = db.length;
+  if (!total) {
+    document.getElementById('statsDetail').innerHTML = '<div class="empty"><span class="empty-icon">📊</span>Agregá camisetas para ver estadísticas</div>';
+    return;
+  }
+  var valorTotal = db.reduce((s,j) => s+(j.valor||0), 0);
+  var valorProm = Math.round(valorTotal/total);
+  var valorMax = db.reduce((m,j) => j.valor > m.valor ? j : m, db[0]);
+
+  function rowsFor(arr, key) {
+    return arr.map(v => {
+      var cnt = db.filter(j=>j[key]===v).length;
+      var val = key==='version' ? db.filter(j=>j[key]===v).reduce((s,j)=>s+(j.valor||0),0) : null;
+      if (!cnt) return '';
+      return '<div class="stats-row-item"><span class="stats-row-lbl">' + v + '</span><span class="stats-row-val">'
+        + cnt + (val!==null ? ' · <span class="gld">USD '+val.toLocaleString()+'</span>' : '')
+        + '</span></div>';
+    }).join('');
+  }
+
+  var anioMap = {};
+  db.forEach(j => { if (j.anio) anioMap[j.anio] = (anioMap[j.anio]||0)+1; });
+  var anioRows = Object.entries(anioMap).sort((a,b)=>b[1]-a[1]).slice(0,6)
+    .map(([a,c]) => '<div class="stats-row-item"><span class="stats-row-lbl">'+a+'</span><span class="stats-row-val">'+c+'</span></div>').join('');
+
+  document.getElementById('statsDetail').innerHTML =
+    '<div class="stats-detail">'
+    + '<div style="grid-column:1/-1;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">'
+    + '<div style="text-align:center;padding:10px;border-right:1px solid var(--border)"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:48px;color:var(--gold);line-height:1">' + total + '</div><div style="font-size:11px;font-family:\'DM Mono\',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:6px">Total camisetas</div></div>'
+    + '<div style="text-align:center;padding:10px;border-right:1px solid var(--border)"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:48px;color:var(--gold);line-height:1">$' + valorTotal.toLocaleString() + '</div><div style="font-size:11px;font-family:\'DM Mono\',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:6px">Valor total (USD)</div></div>'
+    + '<div style="text-align:center;padding:10px"><div style="font-family:\'Bebas Neue\',sans-serif;font-size:48px;color:var(--gold);line-height:1">$' + valorProm.toLocaleString() + '</div><div style="font-size:11px;font-family:\'DM Mono\',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:6px">Valor promedio</div></div>'
+    + '</div>'
+    + '<div class="stats-block"><div class="stats-block-title">Por Versión</div>' + rowsFor(['Titular','Alternativa','Tercera','Aniversario'],'version') + '</div>'
+    + '<div class="stats-block"><div class="stats-block-title">Por Estado</div>' + (rowsFor(['Excelente','Muy bueno','Bueno','Regular'],'estado')||'<div class="stats-row-item"><span class="stats-row-lbl">—</span></div>') + '</div>'
+    + '<div class="stats-block"><div class="stats-block-title">Por Talle</div>' + (rowsFor(['XS','S','M','L','XL','XXL','Infantil'],'talle')||'<div class="stats-row-item"><span class="stats-row-lbl">—</span></div>') + '</div>'
+    + '<div class="stats-block"><div class="stats-block-title">Por Temporada</div>' + (anioRows||'<div class="stats-row-item"><span class="stats-row-lbl">—</span></div>') + '</div>'
+    + (valorMax && valorMax.valor ? '<div class="stats-block" style="grid-column:1/-1"><div class="stats-block-title">⭐ Camiseta más valiosa</div><div class="stats-row-item" style="cursor:pointer" onclick="openDetail(\''+valorMax.id+'\')"><span class="stats-row-lbl">'+valorMax.id+' · '+(valorMax.anio||'')+' '+(valorMax.version||'')+' '+(valorMax.jugador?'· '+valorMax.jugador:'')+' </span><span class="stats-row-val gld">USD '+valorMax.valor.toLocaleString()+'</span></div></div>' : '')
+    + '</div>';
+}
+
+// ── NFC ───────────────────────────────────────────────────
+var scanning = false, nfcReader = null;
+
+function openNFCScan() { switchTab('nfc'); if (!scanning) toggleNFC(); }
+
+function toggleNFC() {
+  if (scanning) { stopNFC(); return; }
+  if ('NDEFReader' in window) {
+    try {
+      nfcReader = new NDEFReader();
+      nfcReader.scan().then(function() {
+        scanning = true; setNFCUI(true);
+        nfcReader.onreading = function(evt) { processNFC(evt.serialNumber.toUpperCase()); };
+        nfcReader.onreadingerror = function() { showToast('error', '❌ Error leyendo tag'); };
+      }).catch(function(e) { showToast('error', '❌ ' + e.message); });
+    } catch(e) { showToast('error', '❌ ' + e.message); }
+  } else {
+    scanning = true; setNFCUI(true);
+    showToast('info', '⚠️ Web NFC no disponible. Usá los simuladores.');
+  }
+}
+
+function stopNFC() { scanning = false; nfcReader = null; setNFCUI(false); }
+
+function setNFCUI(on) {
+  document.getElementById('nfcZone').className = 'nfc-zone' + (on ? ' scanning' : '');
+  document.getElementById('nfcLbl').textContent = on ? 'Escaneando...' : 'Toca para activar escáner';
+  document.getElementById('nfcHint').textContent = on ? 'Acercá un tag NFC' : 'Funciona con Web NFC en Chrome Android';
+}
+
+function processNFC(uid) {
+  var j = db.find(x => x.id.toUpperCase() === uid.toUpperCase());
+  if (j) { showToast('success', '✅ ' + j.id + ' encontrada'); openDetail(j.id); }
+  else {
+    showToast('error', '❓ Tag no registrado: ' + uid);
+    openForm(null);
+    setTimeout(() => { document.getElementById('fId').value = uid; }, 100);
+  }
+}
+
+function simScan(type) {
+  if (type === 'found' && db.length > 0) processNFC(db[0].id);
+  else if (type === 'unknown') processNFC('CAM-' + Math.floor(Math.random()*9000+1000));
+  else showToast('info', 'Agregá una camiseta primero');
+}
+
+// ── URL PARAM (iOS Shortcut) ──────────────────────────────
+function checkURLParam() {
+  var uid = new URLSearchParams(window.location.search).get('uid');
+  if (uid) { setTimeout(() => processNFC(uid), 400); history.replaceState({}, '', window.location.pathname); }
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function switchTab(name) {
+  var names = ['coleccion','estadisticas','nfc'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if (name === 'estadisticas') renderStatsDetail();
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+var toastTmr;
+function showToast(type, msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show ' + type;
+  clearTimeout(toastTmr);
+  toastTmr = setTimeout(() => t.classList.remove('show'), 3400);
+}
+
+// ── OVERLAYS CLOSE ────────────────────────────────────────
+document.getElementById('formOverlay').addEventListener('click', e => { if (e.target.id==='formOverlay') closeForm(); });
+document.getElementById('detailOverlay').addEventListener('click', e => { if (e.target.id==='detailOverlay') closeDetail(); });
+
+// ── INIT ──────────────────────────────────────────────────
+loadDB();
+if (db.length === 0) {
+  db = [
+    { id:'CAM-001', anio:'1987', modelo:'Le Coq Sportif · Auténtica', version:'Titular', talle:'L', mangas:'Corta', torneo:'Copa Libertadores', estado:'Excelente', jugador:'Francescoli', numero:'10', valor:1200, url:'https://claude.site?uid=CAM-001', comentarios:'Camiseta histórica del campeón de América.', photos:[], created:new Date().toISOString() },
+    { id:'CAM-002', anio:'2023-24', modelo:'Topper · Match', version:'Titular', talle:'M', mangas:'Corta', torneo:'Apertura 2023', estado:'Muy bueno', jugador:'', numero:'', valor:85, url:'', comentarios:'', photos:[], created:new Date().toISOString() },
+    { id:'CAM-003', anio:'2022', modelo:'Topper · Réplica', version:'Alternativa', talle:'XL', mangas:'Larga', torneo:'Clausura 2022', estado:'Bueno', jugador:'Rodríguez', numero:'7', valor:60, url:'', comentarios:'', photos:[], created:new Date().toISOString() },
+  ];
+  saveDB();
+}
+renderStats();
+renderGrid();
+checkURLParam();
+</script>
+</body>
+</html>
